@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teka-Teki Kedokteran</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+    .container { background: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; }
+    .question { margin-bottom: 20px; font-weight: bold; }
+    .choices button { display: block; margin: 5px 0; width: 100%; padding: 10px; }
+    .result { font-weight: bold; margin-top: 20px; }
+    .footer { margin-top: 40px; text-align: center; font-style: italic; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Teka-Teki Kedokteran</h1>
+    <div class="question" id="question"></div>
+    <div class="choices" id="choices"></div>
+    <div class="result" id="result"></div>
+    <button onclick="nextQuestion()">Soal Berikutnya</button>
+    <div class="footer">Dibuat oleh Ilham Fadillah</div>
+  </div>
+
+  <script>
+    const soal = [
+      { pertanyaan: "1. Organ manakah yang memproduksi insulin?", pilihan: ["Hati", "Pankreas", "Ginjal", "Limpa"], jawaban: 1 },
+      { pertanyaan: "2. Apa nama ilmiah untuk sel darah merah?", pilihan: ["Leukosit", "Trombosit", "Eritrosit", "Neutrofil"], jawaban: 2 },
+      { pertanyaan: "3. Obat parasetamol digunakan untuk?", pilihan: ["Menurunkan panas", "Menghilangkan batuk", "Mengatasi alergi", "Antibiotik"], jawaban: 0 },
+      { pertanyaan: "4. Pasien demam tinggi, nyeri tekan di kuadran kanan atas, dan hasil USG menunjukkan abses hati. Penyebab tersering?", pilihan: ["TBC", "Amoeba", "Bakteri anaerob", "Virus hepatitis"], jawaban: 1 },
+      { pertanyaan: "5. Pasien dengan hipertensi dan proteinuria >3,5g/hari. Diagnosis?", pilihan: ["Nefritis akut", "Gagal ginjal kronis", "Sindrom nefrotik", "Infeksi saluran kemih"], jawaban: 2 },
+      { pertanyaan: "6. Anemia mikrositik hipokrom disebabkan oleh?", pilihan: ["Kekurangan zat besi", "Kekurangan B12", "Kekurangan asam folat", "Hemolisis akut"], jawaban: 0 },
+      { pertanyaan: "7. Tanda klasik pada sirosis hepatis adalah?", pilihan: ["Edema paru", "Jaundice", "Poliuria", "Tinnitus"], jawaban: 1 },
+      { pertanyaan: "8. Pasien dengan asma berat mengalami wheezing hebat dan sesak. Terapi awal?", pilihan: ["Antibiotik", "Steroid oral", "Salbutamol nebulizer", "Kodein"], jawaban: 2 },
+      { pertanyaan: "9. Pada DKA (diabetes ketoasidosis), pemeriksaan penting berikut ini kecuali?", pilihan: ["Gula darah", "Ketone urin", "EKG", "Kolesterol total"], jawaban: 3 },
+      { pertanyaan: "10. Hipertiroidisme menunjukkan gejala berikut kecuali:", pilihan: ["Tremor", "Berat badan turun", "Bradikardia", "Intoleransi panas"], jawaban: 2 },
+
+      { pertanyaan: "11. Trauma perut tumpul dengan tekanan darah rendah. Tindakan awal?", pilihan: ["USG", "CT-scan", "Laparotomi eksplorasi", "Endoskopi"], jawaban: 2 },
+      { pertanyaan: "12. Luka bakar derajat 2 luas 30%. Cairan awal yang digunakan?", pilihan: ["D5%", "RL", "NaCl 3%", "Albumin"], jawaban: 1 },
+      { pertanyaan: "13. Pada hernia inguinalis lateralis, isi kantung hernia melewati?", pilihan: ["Anulus medialis", "Anulus femoralis", "Anulus lateralis", "Ligamentum inguinale"], jawaban: 2 },
+      { pertanyaan: "14. Pneumotoraks pasca operasi ditangani dengan?", pilihan: ["Observasi", "Antibiotik", "Torus drain", "CPAP"], jawaban: 2 },
+      { pertanyaan: "15. Kanker payudara paling sering ditemukan di kuadran?", pilihan: ["Atas luar", "Bawah dalam", "Bawah luar", "Atas dalam"], jawaban: 0 },
+      { pertanyaan: "16. Tanda klasik apendisitis akut adalah?", pilihan: ["Nyeri epigastrik", "Nyeri kiri atas", "Nyeri periumbilikal ke kanan bawah", "Disuria"], jawaban: 2 },
+      { pertanyaan: "17. Kista Baker paling sering terletak di?", pilihan: ["Leher", "Axilla", "Belakang lutut", "Punggung"], jawaban: 2 },
+      { pertanyaan: "18. Obstruksi usus ditandai dengan?", pilihan: ["Muntah darah", "Diare berdarah", "Distensi abdomen & tidak flatus", "Nyeri ulu hati"], jawaban: 2 },
+      { pertanyaan: "19. Komplikasi utama fraktur pelvis?", pilihan: ["Infeksi", "Pendarahan masif", "Nyeri kronis", "Paralisis tungkai"], jawaban: 1 },
+      { pertanyaan: "20. Penanganan awal luka bersih tertutup?", pilihan: ["Dibiarkan terbuka", "Dijahit primer", "Dibakar", "Antibiotik IV"], jawaban: 1 },
+
+      { pertanyaan: "21. Kehamilan ektopik ruptur ditandai dengan gejala?", pilihan: ["Nyeri epigastrik", "Nyeri perut kiri bawah + pingsan", "Disuria", "Nyeri punggung"], jawaban: 1 },
+      { pertanyaan: "22. Kapan dilakukan pap smear?", pilihan: ["Setiap bulan", "Setiap 6 bulan", "1 tahun sekali", "Saat menstruasi"], jawaban: 2 },
+      { pertanyaan: "23. Plasenta previa adalah kondisi plasenta yang?", pilihan: ["Menempel di dinding belakang", "Menutupi jalan lahir", "Di fundus uteri", "Tidak berkembang"], jawaban: 1 },
+      { pertanyaan: "24. Fase aktif persalinan adalah saat?", pilihan: ["Kontraksi ringan", "Pembukaan serviks >4 cm", "Air ketuban pecah", "Janin mulai bergerak"], jawaban: 1 },
+      { pertanyaan: "25. Bayi lahir dengan APGAR 2, tindakan awal?", pilihan: ["Beri oksigen", "Resusitasi segera", "Biarkan observasi", "Mandikan segera"], jawaban: 1 },
+      { pertanyaan: "26. Pemeriksaan penting pada preeklamsia?", pilihan: ["Hemoglobin", "Protein urin", "SGOT", "Gula darah"], jawaban: 1 },
+      { pertanyaan: "27. Obat lini pertama untuk eklamsia?", pilihan: ["Diazepam", "Magnesium sulfat", "Nifedipine", "Labetalol"], jawaban: 1 },
+      { pertanyaan: "28. Presentasi janin normal adalah?", pilihan: ["Sungsang", "Lintang", "Kepala", "Bahu"], jawaban: 2 },
+      { pertanyaan: "29. Abortus komplit ditandai dengan?", pilihan: ["Tidak ada perdarahan", "Semua jaringan keluar", "Sebagian jaringan keluar", "Janin hidup"], jawaban: 2 },
+      { pertanyaan: "30. Oligohidramnion artinya?", pilihan: ["Air ketuban berlebih", "Air ketuban kurang", "Plasenta lepas", "Infeksi plasenta"], jawaban: 1 },
+
+      { pertanyaan: "31. Telinga berdenging disebut?", pilihan: ["Vertigo", "Tinnitus", "Otalgia", "Otitis"], jawaban: 1 },
+      { pertanyaan: "32. Otitis media akut paling sering disebabkan oleh?", pilihan: ["Bakteri", "Virus", "Jamur", "Alergi"], jawaban: 0 },
+      { pertanyaan: "33. Komplikasi paling berbahaya sinusitis?", pilihan: ["Mata merah", "Abses otak", "Pilek kronik", "Otalgia"], jawaban: 1 },
+      { pertanyaan: "34. Tes garpu tala digunakan untuk?", pilihan: ["Pusing", "Vertigo", "Tuli konduktif/sensorineural", "Infeksi telinga"], jawaban: 2 },
+      { pertanyaan: "35. Epistaksis sering terjadi pada pembuluh di?", pilihan: ["Kiesselbach", "Carotid", "Vertebralis", "Jugularis"], jawaban: 0 },
+      { pertanyaan: "36. Tonsilitis akut gejalanya?", pilihan: ["Batuk kering", "Nyeri telan", "Gatal hidung", "Telinga penuh"], jawaban: 1 },
+      { pertanyaan: "37. Polip hidung menyebabkan?", pilihan: ["Pendengaran tajam", "Hidung tersumbat", "Mata merah", "Mimisan"], jawaban: 1 },
+      { pertanyaan: "38. Tuli sensorineural disebabkan kerusakan pada?", pilihan: ["Saluran luar", "Gendang telinga", "Koklea", "Otot telinga"], jawaban: 2 },
+      { pertanyaan: "39. Pemeriksaan untuk tonsil?", pilihan: ["CT scan", "Inspeksi orofaring", "MRI", "USG"], jawaban: 1 },
+      { pertanyaan: "40. Terapi awal otitis eksterna?", pilihan: ["Antibiotik oral", "Tetes telinga antibiotik", "Steroid", "Kompres hangat"], jawaban: 1 },
+
+      { pertanyaan: "41. Rabun jauh disebut juga?", pilihan: ["Miopia", "Hipermetropia", "Astigmatisma", "Presbiopia"], jawaban: 0 },
+      { pertanyaan: "42. Katarak adalah kekeruhan pada?", pilihan: ["Kornea", "Lensa", "Retina", "Sklera"], jawaban: 1 },
+      { pertanyaan: "43. Glaukoma ditandai dengan?", pilihan: ["Tekanan intraokular meningkat", "Infeksi retina", "Kebutaan mendadak", "Mata kering"], jawaban: 0 },
+      { pertanyaan: "44. Konjungtivitis ditandai dengan?", pilihan: ["Mata kabur", "Nyeri kepala", "Mata merah & berair", "Mata bengkak tanpa nyeri"], jawaban: 2 },
+      { pertanyaan: "45. Pemeriksaan visus menggunakan?", pilihan: ["Otoskop", "Oftalmoskop", "Snellen chart", "Tonometer"], jawaban: 2 },
+      { pertanyaan: "46. Miopia dikoreksi dengan lensa?", pilihan: ["Cembung", "Silinder", "Cekung", "Plano"], jawaban: 2 },
+      { pertanyaan: "47. Penyebab terbanyak kebutaan di Indonesia?", pilihan: ["Glaukoma", "Retinopati diabetik", "Katarak", "Degenerasi makula"], jawaban: 2 },
+      { pertanyaan: "48. Kelopak mata bengkak dan nyeri adalah?", pilihan: ["Hordeolum", "Katarak", "Blefaritis", "Miopia"], jawaban: 0 },
+      { pertanyaan: "49. Retinopati diabetik ditemukan pada pasien?", pilihan: ["Hipertensi", "DM kronis", "Glaukoma", "Miopia tinggi"], jawaban: 1 },
+      { pertanyaan: "50. Strabismus adalah kondisi?", pilihan: ["Buta warna", "Kelopak menutup", "Mata juling", "Mata rabun jauh"], jawaban: 2 }
+    ];
+
+    let current = 0;
+
+    function tampilkanSoal() {
+      const q = soal[current];
+      document.getElementById("question").innerText = q.pertanyaan;
+      const choicesDiv = document.getElementById("choices");
+      choicesDiv.innerHTML = "";
+      q.pilihan.forEach((pilihan, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = pilihan;
+        btn.onclick = () => cekJawaban(index);
+        choicesDiv.appendChild(btn);
+      });
+      document.getElementById("result").innerText = "";
+    }
+
+    function cekJawaban(index) {
+      const benar = soal[current].jawaban === index;
+      document.getElementById("result").innerText = benar ? "Benar!" : "Salah!";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= soal.length) {
+        document.getElementById("question").innerText = "Selesai!";
+        document.getElementById("choices").innerHTML = "";
+        document.getElementById("result").innerText = "";
+      } else {
+        tampilkanSoal();
+      }
+    }
+
+    tampilkanSoal();
+  </script>
+</body>
+</html>
